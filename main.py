@@ -1,9 +1,19 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 import math
 
 app = FastAPI()
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For production, replace with your frontend domain(s)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def extract_video_id(youtube_url: str) -> str:
     patterns = [
@@ -40,7 +50,6 @@ def get_captions_with_timestamps(youtube_url: str, language: str = 'en') -> str:
         formatted_captions.append(f"{start_str}-{end_str}:  {text}")
 
     result = "\n".join(formatted_captions)
-
     return result
 
 @app.get("/")
